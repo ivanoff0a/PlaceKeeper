@@ -1,15 +1,21 @@
 package com.a.placekeeper;
 
+import android.content.res.Configuration;
 import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
 
 
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
+import android.widget.ListView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -18,25 +24,47 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import static android.R.transition.move;
+
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    DrawerLayout mDrawerLayout;
+    ActionBarDrawerToggle mDrawerToggle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_map);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-               .findFragmentById(R.id.map);
+                .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        // настраиваем тулбар
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); // отображаем ДОМОЙ
+        getSupportActionBar().setHomeButtonEnabled(true); // включаем ДОМОЙ
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout); // находим меню
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0); // создаём штуку, которая будет анимировать иконку (и не только)
+        mDrawerLayout.addDrawerListener(mDrawerToggle); // подписываем её на события открытия и закрытия меню (чтобы она знала, когда нужно анимировать кнопку)
     }
+        @Override
+        protected void onPostCreate(Bundle savedInstanceState) {
+            super.onPostCreate(savedInstanceState);
+
+            mDrawerToggle.syncState();
+        }
+
+        @Override
+        public void onConfigurationChanged(Configuration newConfig) {
+            super.onConfigurationChanged(newConfig);
+            mDrawerToggle.onConfigurationChanged(newConfig);
+        }
 
     @Override
     public void onMapReady(GoogleMap map) {
-        // Add a marker in Sydney, Australia, and move the camera.
+         // Add a marker in Sydney, Australia, and move the camera.
         LatLng sydney = new LatLng(60.017584, 30.366934);
         map.addMarker(new MarkerOptions().position(sydney).title("Home"));
         map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
     }
 
     @Override
@@ -46,10 +74,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // открываем меню
                 DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
                 // слева
-                if (drawerLayout.isDrawerOpen(Gravity.START)) {
-                    drawerLayout.closeDrawer(Gravity.START);
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
-                    drawerLayout.openDrawer(Gravity.START);
+                    drawerLayout.openDrawer(GravityCompat.START);
                 }
                 return true;
             default:
@@ -57,4 +85,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+//    ;
+//    ListView listView = (ListView) findViewById(R.id.listView);
+//    int Layout = android.R.layout.simple_list_item_1;
+//
+//    ArrayAdapter arrayAdapter = new ArrayAdapter(this, Layout);
+//    listView.setAdapter(arrayAdapter);
 }
