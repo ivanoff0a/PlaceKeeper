@@ -9,6 +9,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
@@ -20,9 +21,15 @@ import android.widget.ListView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.OnStreetViewPanoramaReadyCallback;
+import com.google.android.gms.maps.StreetViewPanorama;
+import com.google.android.gms.maps.StreetViewPanoramaFragment;
+import com.google.android.gms.maps.StreetViewPanoramaOptions;
+import com.google.android.gms.maps.StreetViewPanoramaView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
 
 import static android.R.transition.move;
 
@@ -30,6 +37,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     DrawerLayout mDrawerLayout;
     ActionBarDrawerToggle mDrawerToggle;
+    StreetViewPanoramaView mSvp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,9 +46,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        streetViewPanoramaFragment.getStreetViewPanoramaAsync((OnStreetViewPanoramaReadyCallback) this);
+        //mSvp = new StreetViewPanoramaView(this, new StreetViewPanoramaOptions().position(SAN_FRAN));
+
         // настраиваем тулбар
+        ActionBar actionBar = getSupportActionBar();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // отображаем ДОМОЙ
         getSupportActionBar().setHomeButtonEnabled(true); // включаем ДОМОЙ
+        actionBar.setTitle("");
+
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout); // находим меню
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0); // создаём штуку, которая будет анимировать иконку (и не только)
         mDrawerLayout.addDrawerListener(mDrawerToggle); // подписываем её на события открытия и закрытия меню (чтобы она знала, когда нужно анимировать кнопку)
@@ -84,8 +100,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return super.onOptionsItemSelected(item);
         }
     }
+    StreetViewPanoramaFragment streetViewPanoramaFragment = (StreetViewPanoramaFragment)
+            getFragmentManager()
+                    .findFragmentById(R.id.streetviewpanorama);
+                    //mSvp.setStreetNamesEnabled(true);
+                    //mSvp.setZoomGesturesEnabled(false);
+                    //mSvp.setUserNavigationEnabled(false);
 
-//    ;
+    public void onStreetViewPanoramaReady(StreetViewPanorama panorama) {
+        panorama.setPosition(new LatLng(-33.87365, 151.20689));
+    }
+    // Set the tilt to zero, keeping the zoom and bearing at current values.
+    // Animate over a duration of 500 milliseconds.
+//    long duration = 500;
+//    float tilt = 0;
+//    StreetViewPanoramaCamera camera = new StreetViewPanoramaCamera.Builder()
+//            .zoom(mSvp.getPanoramaCamera().zoom)
+//            .bearing(mSvp.getPanoramaCamera().bearing)
+//            .tilt(tilt)
+//            .build();
+//
+//    mSvp.animateTo(camera, duration);
+
+
+
+
+
+
+;
 //    ListView listView = (ListView) findViewById(R.id.listView);
 //    int Layout = android.R.layout.simple_list_item_1;
 //
