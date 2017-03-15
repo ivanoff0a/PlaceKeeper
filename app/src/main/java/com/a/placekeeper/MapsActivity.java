@@ -1,6 +1,10 @@
 package com.a.placekeeper;
 
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.support.annotation.NonNull;
+import android.support.design.internal.NavigationMenu;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -9,6 +13,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
@@ -16,6 +21,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,11 +45,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         // настраиваем тулбар
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // отображаем ДОМОЙ
         getSupportActionBar().setHomeButtonEnabled(true); // включаем ДОМОЙ
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout); // находим меню
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0); // создаём штуку, которая будет анимировать иконку (и не только)
         mDrawerLayout.addDrawerListener(mDrawerToggle); // подписываем её на события открытия и закрытия меню (чтобы она знала, когда нужно анимировать кнопку)
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+               switch (item.getItemId()) {
+                   case R.id.favourites_item:
+                       Intent intent = new Intent(MapsActivity.this,FavouriteActivity.class);
+                       startActivity(intent);
+                       mDrawerLayout.closeDrawer(Gravity.START);
+                       break;
+                   case R.id.settings_item:
+                       Intent intent2 = new Intent(MapsActivity.this, SettingsActivity.class);
+                       startActivity(intent2);
+                       mDrawerLayout.closeDrawer(Gravity.START);
+                       break;
+
+               }
+
+                return true;
+            }
+        });
     }
         @Override
         protected void onPostCreate(Bundle savedInstanceState) {
@@ -84,11 +116,4 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return super.onOptionsItemSelected(item);
         }
     }
-
-//    ;
-//    ListView listView = (ListView) findViewById(R.id.listView);
-//    int Layout = android.R.layout.simple_list_item_1;
-//
-//    ArrayAdapter arrayAdapter = new ArrayAdapter(this, Layout);
-//    listView.setAdapter(arrayAdapter);
 }
