@@ -1,28 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
+<
     xmlns:android="http://schemas.android.com/apk/res/android"
     >
 
     <item
-        android:title="Маршруты"
+        android:title=""
         >
 
         <menu>
             <item
                 android:id="@+id/favourites_item"
                 android:checkable="true"
-                android:title="Избранные"
+                android:title="Ваши Места"
                 />
             <item
                 android:id="@+id/walk"
                 android:checkable="true"
-                android:title="Пешие" />
+                android:title="Пешие Маршруты" />
         </menu>
     </item>
-
     <item
-        android:title="Дополнительно"
-        >
+        android:title=""
+        />
+
+            <item
+                android:id="@+id/mapschooser1_item"
+                android:checkable="true"
+                android:title="noname" />
+            <item
+                android:id="@+id/mapschooser2_item"
+                android:checkable="true"
+                android:title="noname" />
+            <item
+                android:id="@+id/mapschooser3_item"
+                android:checkable="true"
+                android:title="noname" />
+            <item
+                android:id="@+id/mapschooser4_item"
+                android:checkable="true"
+                android:title="noname" />
+        </menu>
+    </item>
+    <item
+        android:title=""
+        />
 
         <menu>
             <item
@@ -30,5 +51,4 @@
                 android:checkable="true"
                 android:title="Настройки" />
         </menu>
-    </item>
 </menu>

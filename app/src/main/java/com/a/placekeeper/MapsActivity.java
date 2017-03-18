@@ -1,11 +1,13 @@
 package com.a.placekeeper;
 
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.support.annotation.NonNull;
+import android.support.design.internal.NavigationMenu;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
-
-
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,6 +19,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,23 +35,25 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
 
 import static android.R.transition.move;
+import static android.support.design.R.styleable.NavigationView;
+import static android.support.v7.appcompat.R.styleable.ActionBar;
+import static com.a.placekeeper.R.id.map;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     DrawerLayout mDrawerLayout;
     ActionBarDrawerToggle mDrawerToggle;
-    StreetViewPanoramaView mSvp;
+    GoogleMap Map;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_map);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(map);
         mapFragment.getMapAsync(this);
-
-        streetViewPanoramaFragment.getStreetViewPanoramaAsync((OnStreetViewPanoramaReadyCallback) this);
-        //mSvp = new StreetViewPanoramaView(this, new StreetViewPanoramaOptions().position(SAN_FRAN));
 
         // настраиваем тулбар
         ActionBar actionBar = getSupportActionBar();
@@ -56,31 +61,78 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         getSupportActionBar().setHomeButtonEnabled(true); // включаем ДОМОЙ
         actionBar.setTitle("");
 
-
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout); // находим меню
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0); // создаём штуку, которая будет анимировать иконку (и не только)
         mDrawerLayout.addDrawerListener(mDrawerToggle); // подписываем её на события открытия и закрытия меню (чтобы она знала, когда нужно анимировать кнопку)
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.favourites_item:
+                        Intent intent = new Intent(MapsActivity.this, FavouriteActivity.class);
+                        startActivity(intent);
+                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        break;
+                    case R.id.settings_item:
+                        Intent intent2 = new Intent(MapsActivity.this, SettingsActivity.class);
+                        startActivity(intent2);
+                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        break;
+
+                    case R.id.mapschooser1_item:
+                        Map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        break;
+
+                    case R.id.mapschooser2_item:
+                        Map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        break;
+
+                    case R.id.mapschooser3_item:
+                        Map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        break;
+
+                    case R.id.mapschooser4_item:
+                        Map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        break;
+
+
+
+
+
+                }
+
+                return true;
+            }
+        });
     }
-        @Override
-        protected void onPostCreate(Bundle savedInstanceState) {
-            super.onPostCreate(savedInstanceState);
 
-            mDrawerToggle.syncState();
-        }
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
 
-        @Override
-        public void onConfigurationChanged(Configuration newConfig) {
-            super.onConfigurationChanged(newConfig);
-            mDrawerToggle.onConfigurationChanged(newConfig);
-        }
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
 
     @Override
     public void onMapReady(GoogleMap map) {
-         // Add a marker in Sydney, Australia, and move the camera.
+        // Add a marker in Sydney, Australia, and move the camera.
         LatLng sydney = new LatLng(60.017584, 30.366934);
         map.addMarker(new MarkerOptions().position(sydney).title("Home"));
         map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
 
     @Override
@@ -100,37 +152,4 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return super.onOptionsItemSelected(item);
         }
     }
-    StreetViewPanoramaFragment streetViewPanoramaFragment = (StreetViewPanoramaFragment)
-            getFragmentManager()
-                    .findFragmentById(R.id.streetviewpanorama);
-                    //mSvp.setStreetNamesEnabled(true);
-                    //mSvp.setZoomGesturesEnabled(false);
-                    //mSvp.setUserNavigationEnabled(false);
-
-    public void onStreetViewPanoramaReady(StreetViewPanorama panorama) {
-        panorama.setPosition(new LatLng(-33.87365, 151.20689));
-    }
-    // Set the tilt to zero, keeping the zoom and bearing at current values.
-    // Animate over a duration of 500 milliseconds.
-//    long duration = 500;
-//    float tilt = 0;
-//    StreetViewPanoramaCamera camera = new StreetViewPanoramaCamera.Builder()
-//            .zoom(mSvp.getPanoramaCamera().zoom)
-//            .bearing(mSvp.getPanoramaCamera().bearing)
-//            .tilt(tilt)
-//            .build();
-//
-//    mSvp.animateTo(camera, duration);
-
-
-
-
-
-
-;
-//    ListView listView = (ListView) findViewById(R.id.listView);
-//    int Layout = android.R.layout.simple_list_item_1;
-//
-//    ArrayAdapter arrayAdapter = new ArrayAdapter(this, Layout);
-//    listView.setAdapter(arrayAdapter);
 }
