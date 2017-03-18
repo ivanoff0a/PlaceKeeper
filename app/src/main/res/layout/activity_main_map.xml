@@ -5,7 +5,8 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.a.placekeeper.MapsActivity">
+    tools:context="com.a.placekeeper.MapsActivity"
+    >
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -28,6 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:menu="@menu/navigation_menu"
+            android:background="#222"
             />
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

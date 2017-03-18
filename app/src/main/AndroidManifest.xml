@@ -7,7 +7,9 @@
         android:icon="@mipmap/ic_launcher2"
         android:label="Sight Keeper"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        >
+
         <activity
             android:name=".MapsActivity"
             android:theme="@style/AppTheme.TransparentBars"
@@ -18,6 +20,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:theme="@style/AppTheme"
+            >
+        </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAEzjz8XdgWksDnHa8zQdbdp5e-d2pXKos" />

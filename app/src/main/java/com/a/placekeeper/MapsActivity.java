@@ -3,9 +3,7 @@ package com.a.placekeeper;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
-import android.support.design.internal.NavigationMenu;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
 import android.os.Bundle;
@@ -16,34 +14,20 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.OnStreetViewPanoramaReadyCallback;
-import com.google.android.gms.maps.StreetViewPanorama;
-import com.google.android.gms.maps.StreetViewPanoramaFragment;
-import com.google.android.gms.maps.StreetViewPanoramaOptions;
-import com.google.android.gms.maps.StreetViewPanoramaView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
 
-import static android.R.transition.move;
-import static android.support.design.R.styleable.NavigationView;
-import static android.support.v7.appcompat.R.styleable.ActionBar;
 import static com.a.placekeeper.R.id.map;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     DrawerLayout mDrawerLayout;
     ActionBarDrawerToggle mDrawerToggle;
-    GoogleMap Map;
+    GoogleMap _map;
 
 
     @Override
@@ -82,31 +66,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         break;
 
                     case R.id.mapschooser1_item:
-                        Map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                        _map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                         mDrawerLayout.closeDrawer(Gravity.LEFT);
                         break;
 
                     case R.id.mapschooser2_item:
-                        Map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                        _map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
                         mDrawerLayout.closeDrawer(Gravity.LEFT);
                         break;
 
                     case R.id.mapschooser3_item:
-                        Map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                        _map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                         mDrawerLayout.closeDrawer(Gravity.LEFT);
                         break;
-
-                    case R.id.mapschooser4_item:
-                        Map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                        mDrawerLayout.closeDrawer(Gravity.LEFT);
-                        break;
-
-
-
-
-
                 }
-
                 return true;
             }
         });
@@ -133,6 +106,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.addMarker(new MarkerOptions().position(sydney).title("Home"));
         map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        _map = map;
     }
 
     @Override

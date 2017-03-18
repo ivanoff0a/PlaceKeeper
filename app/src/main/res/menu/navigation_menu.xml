@@ -1,54 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     >
 
-    <item
-        android:title=""
+    <group>
+        <item
+            android:id="@+id/favourites_item"
+            android:checkable="true"
+            android:title="Ваши Места"
+            android:icon="@drawable/ic_place_white_36dp"
+            />
+        <item
+            android:id="@+id/walk"
+            android:checkable="true"
+            android:title="Пешие Маршруты" />
+    </group>
+
+    <group
         >
+        <item
+            android:id="@+id/mapschooser1_item"
+            android:checkable="true"
+            android:title="Гибридная" />
+        <item
+            android:id="@+id/mapschooser2_item"
+            android:checkable="true"
+            android:title="Стандартная" />
+        <item
+            android:id="@+id/mapschooser3_item"
+            android:checkable="true"
+            android:title="Карта местности" />
+    </group>
 
-        <menu>
-            <item
-                android:id="@+id/favourites_item"
-                android:checkable="true"
-                android:title="Ваши Места"
-                />
-            <item
-                android:id="@+id/walk"
-                android:checkable="true"
-                android:title="Пешие Маршруты" />
-        </menu>
-    </item>
-    <item
-        android:title=""
-        />
+    <group>
+        <item
+            android:id="@+id/settings_item"
+            android:checkable="true"
+            android:title="Настройки" />
 
-            <item
-                android:id="@+id/mapschooser1_item"
-                android:checkable="true"
-                android:title="noname" />
-            <item
-                android:id="@+id/mapschooser2_item"
-                android:checkable="true"
-                android:title="noname" />
-            <item
-                android:id="@+id/mapschooser3_item"
-                android:checkable="true"
-                android:title="noname" />
-            <item
-                android:id="@+id/mapschooser4_item"
-                android:checkable="true"
-                android:title="noname" />
-        </menu>
-    </item>
-    <item
-        android:title=""
-        />
-
-        <menu>
-            <item
-                android:id="@+id/settings_item"
-                android:checkable="true"
-                android:title="Настройки" />
-        </menu>
+    </group>
 </menu>
