@@ -8,13 +8,29 @@
     tools:context="com.a.placekeeper.MapsActivity"
     >
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/map"
-        tools:context=".MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment" />
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="105dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Name"
+            android:hint=""
+            />
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".MapsActivity" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:background="#111"
@@ -30,5 +46,6 @@
             android:layout_height="match_parent"
             app:menu="@menu/navigation_menu"
             />
+
     </LinearLayout>
 </android.support.v4.widget.DrawerLayout>

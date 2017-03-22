@@ -1,7 +1,9 @@
 package com.a.placekeeper;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 
@@ -14,6 +16,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,12 +26,14 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import static com.a.placekeeper.R.id.map;
+import static com.a.placekeeper.R.id.text;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     DrawerLayout mDrawerLayout;
     ActionBarDrawerToggle mDrawerToggle;
     GoogleMap _map;
+    EditText editText;
 
 
     @Override
@@ -39,6 +44,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
+
+        editText = (EditText) findViewById(R.id.editText);
 
         // настраиваем тулбар
         ActionBar actionBar = getSupportActionBar();
@@ -102,6 +109,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return true;
             }
         });
+    }
+
+    public void onResume(){
+        super.onResume();
+
+        String text = load();
+        editText.setText(text);
+    }
+
+    public void onPause(){
+        super.onPause();
+
+        save(editText.getText().toString());
+    }
+
+    private void save(String text){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("СТРОЧКА", text);
+        editor.commit();
+    }
+
+    private String load(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String text = preferences.getString("СТРОЧКА", "");
+
+        return text;
     }
 
     @Override
