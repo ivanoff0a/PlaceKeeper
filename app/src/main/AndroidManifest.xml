@@ -26,8 +26,20 @@
             android:theme="@style/AppTheme"
             >
         </activity>
+        <activity
+            android:name=".FavouriteActivity"
+            android:theme="@style/AppTheme"
+            >
+        </activity>
+        <activity
+            android:name="."
+            android:theme="@style/AppTheme"
+            >
+        </activity>
 
-        <meta-data
+
+
+    <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAEzjz8XdgWksDnHa8zQdbdp5e-d2pXKos" />
     </application>

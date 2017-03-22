@@ -19,6 +19,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import static com.a.placekeeper.R.id.map;
@@ -79,6 +80,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         _map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                         mDrawerLayout.closeDrawer(Gravity.LEFT);
                         break;
+                    case R.id.mapstylechooser1_item:
+                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_silver));
+                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        break;
+
+                    case R.id.mapstylechooser2_item:
+                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_night));
+                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        break;
+
+                    case R.id.mapstylechooser3_item:
+                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_aubergine));
+                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        break;
+                    case R.id.mapstylechooser4_item:
+                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_retro));
+                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        break;
                 }
                 return true;
             }
@@ -102,11 +121,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap map) {
         // Add a marker in Sydney, Australia, and move the camera.
+        _map = map;
         LatLng sydney = new LatLng(60.017584, 30.366934);
         map.addMarker(new MarkerOptions().position(sydney).title("Home"));
         map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        _map = map;
+        _map.getUiSettings().setZoomControlsEnabled(true);
+        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.google_map_style_standard));
     }
 
     @Override

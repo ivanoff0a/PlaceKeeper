@@ -2,7 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     >
 
-    <group>
+    <group
+        android:id="@+id/group_1"
+        android:checkableBehavior="single"
+        >
         <item
             android:id="@+id/favourites_item"
             android:checkable="true"
@@ -12,30 +15,68 @@
         <item
             android:id="@+id/walk"
             android:checkable="true"
-            android:title="Пешие Маршруты" />
+            android:title="Пешие Маршруты"
+            android:icon="@drawable/ic_transfer_within_a_station_black_36dp"/>
     </group>
 
     <group
-        >
+            android:id="@+id/group_2"
+            android:checkableBehavior="single"
+             android:title="Вид карты"
+         >
         <item
             android:id="@+id/mapschooser1_item"
             android:checkable="true"
-            android:title="Гибридная" />
+            android:title="Гибридная"
+            android:icon="@drawable/ic_satellite_black_36dp"/>
         <item
             android:id="@+id/mapschooser2_item"
             android:checkable="true"
-            android:title="Стандартная" />
+            android:title="Стандартная"
+            android:icon="@drawable/ic_terrain_black_36dp"/>
         <item
             android:id="@+id/mapschooser3_item"
             android:checkable="true"
-            android:title="Карта местности" />
+            android:title="Карта местности"
+            android:icon="@drawable/ic_map_black_36dp"/>
+    </group>
+    <group
+        android:id="@+id/group_3"
+        android:checkableBehavior="single"
+        android:title="Стиль карты"
+        >
+        <item
+            android:id="@+id/mapstylechooser1_item"
+            android:checkable="true"
+            android:title="Silver"
+            />
+        <item
+            android:id="@+id/mapstylechooser2_item"
+            android:checkable="true"
+            android:title="Night"
+            />
+        <item
+            android:id="@+id/mapstylechooser3_item"
+            android:checkable="true"
+            android:title="Aubergine"
+            />
+        <item
+            android:id="@+id/mapstylechooser4_item"
+            android:checkable="true"
+            android:title="Retro"
+            />
     </group>
 
-    <group>
+    <group
+        android:id="@+id/group_4"
+        android:checkableBehavior="single"
+        android:title="Дополнительно"
+        >
         <item
             android:id="@+id/settings_item"
             android:checkable="true"
-            android:title="Настройки" />
+            android:title="Настройки"
+            android:icon="@drawable/ic_settings_black_36dp"/>
 
     </group>
 </menu>
