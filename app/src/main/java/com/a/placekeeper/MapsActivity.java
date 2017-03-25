@@ -1,12 +1,18 @@
 package com.a.placekeeper;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
@@ -14,15 +20,20 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import static com.a.placekeeper.R.id.map;
@@ -30,11 +41,13 @@ import static com.a.placekeeper.R.id.text;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    private static final int REQUEST_CODE_PLACE_PICKER = 1;
+
     DrawerLayout mDrawerLayout;
     ActionBarDrawerToggle mDrawerToggle;
     GoogleMap _map;
     EditText editText;
-
+    Boolean mPickerStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +58,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
 
-        editText = (EditText) findViewById(R.id.editText);
-
         // настраиваем тулбар
-        ActionBar actionBar = getSupportActionBar();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); // отображаем ДОМОЙ
-        getSupportActionBar().setHomeButtonEnabled(true); // включаем ДОМОЙ
-        actionBar.setTitle("");
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("");
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout); // находим меню
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0); // создаём штуку, которая будет анимировать иконку (и не только)
@@ -109,34 +121,42 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return true;
             }
         });
+        FloatingActionButton searchbutton = (FloatingActionButton) findViewById(R.id.button2);
+        searchbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pickPlace();
+
+            }
+        });
     }
 
-    public void onResume(){
-        super.onResume();
-
-        String text = load();
-        editText.setText(text);
-    }
-
-    public void onPause(){
-        super.onPause();
-
-        save(editText.getText().toString());
-    }
-
-    private void save(String text){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("СТРОЧКА", text);
-        editor.commit();
-    }
-
-    private String load(){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String text = preferences.getString("СТРОЧКА", "");
-
-        return text;
-    }
+//    public void onResume(){
+//        super.onResume();
+//
+//        String text = load();
+//        editText.setText(text);
+//    }
+//
+//    public void onPause(){
+//        super.onPause();
+//
+//        save(editText.getText().toString());
+//    }
+//
+//    private void save(String text){
+//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        SharedPreferences.Editor editor = preferences.edit();
+//        editor.putString("СТРОЧКА", text);
+//        editor.commit();
+//    }
+//
+//    private String load(){
+//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        String text = preferences.getString("СТРОЧКА", "");
+//
+//        return text;
+//    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -157,10 +177,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Add a marker in Sydney, Australia, and move the camera.
         _map = map;
         LatLng sydney = new LatLng(60.017584, 30.366934);
-        map.addMarker(new MarkerOptions().position(sydney).title("Home"));
         map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        _map.getUiSettings().setZoomControlsEnabled(true);
+
         _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.google_map_style_standard));
     }
 
@@ -181,4 +200,46 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    /**
+     * Метод открывает выбиралку мест.
+     */
+    private void pickPlace() {
+        if (mPickerStarted) { // если выбиралка запущена
+            Toast.makeText(MapsActivity.this, "Подождите, сейчас всё будет.", Toast.LENGTH_LONG).show();
+        } else {
+            try {
+                PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder(); // создаём строителя конверта для запуска активности с выбиралкой мест
+                intentBuilder.setLatLngBounds(_map.getProjection().getVisibleRegion().latLngBounds); // в него кладём также выбранный на карте регион
+                Intent intent = intentBuilder.build(MapsActivity.this); // создаём конверт
+                startActivityForResult(intent, REQUEST_CODE_PLACE_PICKER); // стартуем активность
+                mPickerStarted = true; // ставим флаг, что запустили выбиралку
+            } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                // ошибки игнорируем
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // если получили ответ от активности с выбиралкой мест
+        // и код результата - OK (то есть пользователь не отменил выбиралку, а выбрал место)
+        if (requestCode == REQUEST_CODE_PLACE_PICKER) {
+            if (resultCode == Activity.RESULT_OK) {
+                // получаем выбранное место
+                // Place - класс с данными об этом месте, там есть и координаты, и тип места, и телефон, ...
+                Place place = PlacePicker.getPlace(MapsActivity.this, data);
+                // добавляем маркер
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(place.getLatLng()) // координаты
+                        .title(place.getName().toString()) // заголовок
+                        .snippet(place.getAddress().toString()); // адрес в качестве описания
+                Marker marker = _map.addMarker(markerOptions);
+            }
+            mPickerStarted = false; // сбрасываем флаг
+        } else { // если получили от другой активности ответ
+            super.onActivityResult(requestCode, resultCode, data); // то вызываем стандартный обработчик
+        }
+    }
+
 }
