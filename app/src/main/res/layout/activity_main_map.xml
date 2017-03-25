@@ -13,6 +13,13 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <Button
+            android:text="Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/button2"
+            android:layout_marginTop="250dp"/>
+
         <EditText
             android:id="@+id/editText"
             android:layout_width="match_parent"
