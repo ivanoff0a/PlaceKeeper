@@ -88,7 +88,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mPanoramaView.onCreate(null);
 
         mPanoramaView.getStreetViewPanoramaAsync(this);// запускаем инициализацию панорамы
-        mPanoramaView.animate().translationY(250);
+        mPanoramaView.setTranslationY(600);
 
         // настраиваем тулбар
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -170,11 +170,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // подписываемся на событие изменения координат в панораме
         mPanorama.setOnStreetViewPanoramaChangeListener(new StreetViewPanorama.OnStreetViewPanoramaChangeListener() {
             @Override
-            public void onStreetViewPanoramaChange(StreetViewPanoramaLocation panoramaLocation) {
-                if (panoramaLocation == null) { // если для этой точки на карте нет панорамки
-                    // TODO можно вывести тост с ошибкой
-                } else { // иначе (то есть панорамка есть)
-                    //(panoramaLocation.position); // двигаем маркер и камеру на карте
+            public void onStreetViewPanoramaChange(StreetViewPanoramaLocation streetViewPanoramaLocation) {
+                if (streetViewPanoramaLocation != null && streetViewPanoramaLocation.links != null) {
+                    // панорама есть
+                } else {
+                    // панорамы нет
+                    mPanoramaView.setTranslationY(400);
+
                 }
             }
         });
@@ -225,18 +227,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Add a marker in Sydney, Australia, and move the camera.
         _map = map;
         LatLng sydney = new LatLng(60.017584, 30.366934);
+        setMyLocationEnabled();
         map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.google_map_style_standard));
-        setMyLocationEnabled();
+        _map.setPadding(0, 200, 0, 0);
+
 
         _map.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
             @Override
             public void onPoiClick(PointOfInterest poi) {
-            mPanoramaView.animate().translationY(-250);
+                mPanoramaView.animate().translationY(0);
+                mPanorama.setPosition(poi.latLng);
             }
         });
+        _map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                mPanoramaView.animate().translationY(600);
 
+
+            }
+        });
     }
 
     @Override
