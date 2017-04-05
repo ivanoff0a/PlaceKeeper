@@ -1,11 +1,13 @@
 package com.a.placekeeper;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 
@@ -13,8 +15,10 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -22,24 +26,38 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnStreetViewPanoramaReadyCallback;
+import com.google.android.gms.maps.StreetViewPanorama;
+import com.google.android.gms.maps.StreetViewPanoramaView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PointOfInterest;
+import com.google.android.gms.maps.model.StreetViewPanoramaLocation;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
+import static android.R.attr.permission;
 import static com.a.placekeeper.R.id.map;
 import static com.a.placekeeper.R.id.text;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnStreetViewPanoramaReadyCallback {
 
     private static final int REQUEST_CODE_PLACE_PICKER = 1;
 
@@ -48,6 +66,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     GoogleMap _map;
     EditText editText;
     Boolean mPickerStarted = false;
+    MapView mMapView;
+    private StreetViewPanoramaView mPanoramaView; // вьюшка с панорамой
+    private StreetViewPanorama mPanorama; // cама панорама
+    private LatLng mLatLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +79,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
+
+        // ищем вьюшки
+        mPanoramaView = (StreetViewPanoramaView) findViewById(R.id.street_view_panorama_view);
+        // нужно обязательо свзяать методы onCreate, onStart, ... вьюшек с картой и панорамой
+        // с соотвествующими методами фрагмента или активности,
+        // вот здесь, например, в onViewCreated(...) вызываем onCreate(...)
+        mPanoramaView.onCreate(null);
+
+        mPanoramaView.getStreetViewPanoramaAsync(this);// запускаем инициализацию панорамы
+        mPanoramaView.animate().translationY(250);
 
         // настраиваем тулбар
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -99,24 +131,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         _map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                         mDrawerLayout.closeDrawer(Gravity.LEFT);
                         break;
-                    case R.id.mapstylechooser1_item:
-                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_silver));
-                        mDrawerLayout.closeDrawer(Gravity.LEFT);
-                        break;
-
-                    case R.id.mapstylechooser2_item:
-                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_night));
-                        mDrawerLayout.closeDrawer(Gravity.LEFT);
-                        break;
-
-                    case R.id.mapstylechooser3_item:
-                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_aubergine));
-                        mDrawerLayout.closeDrawer(Gravity.LEFT);
-                        break;
-                    case R.id.mapstylechooser4_item:
-                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_retro));
-                        mDrawerLayout.closeDrawer(Gravity.LEFT);
-                        break;
+//                    case R.id.mapstylechooser1_item:
+//                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_silver));
+//                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+//                        break;
+//
+//                    case R.id.mapstylechooser2_item:
+//                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_night));
+//                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+//                        break;
+//
+//                    case R.id.mapstylechooser3_item:
+//                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_aubergine));
+//                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+//                        break;
+//                    case R.id.mapstylechooser4_item:
+//                        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this, R.raw.google_map_style_retro));
+//                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+//                        break;
                 }
                 return true;
             }
@@ -131,6 +163,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    public void onStreetViewPanoramaReady(final StreetViewPanorama panorama) {
+        mPanorama = panorama; // сохраняем панорамку в глобальную переменную
+        //setPanoramaTo(mLatLng); // устанавливаем её в текущую позицию
+
+        // подписываемся на событие изменения координат в панораме
+        mPanorama.setOnStreetViewPanoramaChangeListener(new StreetViewPanorama.OnStreetViewPanoramaChangeListener() {
+            @Override
+            public void onStreetViewPanoramaChange(StreetViewPanoramaLocation panoramaLocation) {
+                if (panoramaLocation == null) { // если для этой точки на карте нет панорамки
+                    // TODO можно вывести тост с ошибкой
+                } else { // иначе (то есть панорамка есть)
+                    //(panoramaLocation.position); // двигаем маркер и камеру на карте
+                }
+            }
+        });
+    }
 //    public void onResume(){
 //        super.onResume();
 //
@@ -179,8 +227,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng sydney = new LatLng(60.017584, 30.366934);
         map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
         _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.google_map_style_standard));
+        setMyLocationEnabled();
+
+        _map.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
+            @Override
+            public void onPoiClick(PointOfInterest poi) {
+            mPanoramaView.animate().translationY(-250);
+            }
+        });
+
     }
 
     @Override
@@ -241,5 +297,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             super.onActivityResult(requestCode, resultCode, data); // то вызываем стандартный обработчик
         }
     }
+    public void setMyLocationEnabled(){
+        Dexter.withActivity(MapsActivity.this) // создаём этот Dexter
+                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION) // просим попросить у пользователя разрешение на геолокационные данные
+                .withListener(new PermissionListener() { // и подписываемся на результат
 
+                    @SuppressWarnings("MissingPermission")
+                    @Override public void onPermissionGranted(PermissionGrantedResponse response) {
+                        // если получили разрешение, то
+                        _map.setMyLocationEnabled(true); // включаем у карты местоположение
+                        _map.getUiSettings().setMyLocationButtonEnabled(true); // добавляем кнопочку
+                    }
+
+                    @Override public void onPermissionDenied(PermissionDeniedResponse response) {
+                        // ну, если пользователь не дал разрешение, не добавляем ничего
+                    }
+
+                    @Override public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                        // здесь ничего не делаем
+                    }
+
+                }).check(); // запускаем Dexter
+    }
 }

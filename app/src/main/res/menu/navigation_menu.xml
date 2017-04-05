@@ -40,32 +40,32 @@
             android:title="Карта местности"
             android:icon="@drawable/ic_map_black_36dp"/>
     </group>
-    <group
-        android:id="@+id/group_3"
-        android:checkableBehavior="single"
-        android:title="Стиль карты"
-        >
-        <item
-            android:id="@+id/mapstylechooser1_item"
-            android:checkable="true"
-            android:title="Silver"
-            />
-        <item
-            android:id="@+id/mapstylechooser2_item"
-            android:checkable="true"
-            android:title="Night"
-            />
-        <item
-            android:id="@+id/mapstylechooser3_item"
-            android:checkable="true"
-            android:title="Aubergine"
-            />
-        <item
-            android:id="@+id/mapstylechooser4_item"
-            android:checkable="true"
-            android:title="Retro"
-            />
-    </group>
+    <!--<group-->
+        <!--android:id="@+id/group_3"-->
+        <!--android:checkableBehavior="single"-->
+        <!--android:title="Стиль карты"-->
+        <!--&gt;-->
+        <!--<item-->
+            <!--android:id="@+id/mapstylechooser1_item"-->
+            <!--android:checkable="true"-->
+            <!--android:title="Silver"-->
+            <!--/>-->
+        <!--<item-->
+            <!--android:id="@+id/mapstylechooser2_item"-->
+            <!--android:checkable="true"-->
+            <!--android:title="Night"-->
+            <!--/>-->
+        <!--<item-->
+            <!--android:id="@+id/mapstylechooser3_item"-->
+            <!--android:checkable="true"-->
+            <!--android:title="Aubergine"-->
+            <!--/>-->
+        <!--<item-->
+            <!--android:id="@+id/mapstylechooser4_item"-->
+            <!--android:checkable="true"-->
+            <!--android:title="Retro"-->
+            <!--/>-->
+    <!--</group>-->
 
     <group
         android:id="@+id/group_4"
