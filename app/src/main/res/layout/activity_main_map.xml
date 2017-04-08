@@ -48,9 +48,9 @@
             android:layout_width="220dp"
             android:layout_height="120dp"
             android:layout_weight="0.5"
-            android:layout_marginBottom="66dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginStart="24dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="11dp"
+            android:layout_marginStart="11dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />

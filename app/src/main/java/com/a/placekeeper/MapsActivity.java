@@ -3,11 +3,9 @@ package com.a.placekeeper;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.preference.PreferenceManager;
+import android.location.Location;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 
@@ -18,19 +16,14 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -45,8 +38,8 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
+import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
 import com.google.android.gms.maps.model.StreetViewPanoramaLocation;
-import com.google.android.gms.maps.model.StreetViewPanoramaOrientation;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -54,10 +47,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
-import static android.R.attr.permission;
 import static com.a.placekeeper.R.id.map;
-import static com.a.placekeeper.R.id.street_view_panorama_view;
-import static com.a.placekeeper.R.id.text;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnStreetViewPanoramaReadyCallback {
 
@@ -72,6 +62,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private StreetViewPanoramaView mPanoramaView; // вьюшка с панорамой
     private StreetViewPanorama mPanorama; // cама панорама
     private LatLng mLatLng;
+    Boolean bigPanoramaIsOpened = false;
+    boolean locationIsChanged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,9 +160,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onStreetViewPanoramaReady(final StreetViewPanorama panorama) {
         mPanorama = panorama; // сохраняем панорамку в глобальную переменную
         //setPanoramaTo(mLatLng); // устанавливаем её в текущую позицию
-        mPanoramaView.setOnClickListener(new StreetViewPanorama.OnStreetViewPanoramaClickListener()) {
+
+        mPanorama.setOnStreetViewPanoramaCameraChangeListener(new StreetViewPanorama.OnStreetViewPanoramaCameraChangeListener() {
             @Override
-            public void onStreetViewPanoramaClick(StreetViewPanoramaOrientation streetViewPanoramaOrientation) {
+            public void onStreetViewPanoramaCameraChange(StreetViewPanoramaCamera streetViewPanoramaCamera) {
+                if (bigPanoramaIsOpened == false) {
+                    Intent intent = new Intent(MapsActivity.this, HugePanoramaActivity.class);
+                    intent.putExtra("LATLNG", mLatLng);
+                    startActivity(intent);
+                    bigPanoramaIsOpened = true;
+                }
 
             }
         });
@@ -189,6 +188,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
     }
+
+    public void onResume(){
+        super.onResume();
+        bigPanoramaIsOpened = false;
+    }
+
+
+//        super.onResume();
+//
+//        String text = load();
+//        editText.setText(text);
+//    }
 //    public void onResume(){
 //        super.onResume();
 //
@@ -247,6 +258,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onPoiClick(PointOfInterest poi) {
                 mPanoramaView.animate().translationY(0);
                 mPanorama.setPosition(poi.latLng);
+                mLatLng = poi.latLng;
             }
         });
         _map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -317,6 +329,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             super.onActivityResult(requestCode, resultCode, data); // то вызываем стандартный обработчик
         }
     }
+
+
+
+
+    private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
+        @Override
+        public void onMyLocationChange(Location location) {
+            Marker marker;
+            LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+            marker = _map.addMarker(new MarkerOptions().position(loc));
+            if(_map != null){
+                _map.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
+            }
+        }
+    };
+
     public void setMyLocationEnabled(){
         Dexter.withActivity(MapsActivity.this) // создаём этот Dexter
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION) // просим попросить у пользователя разрешение на геолокационные данные
@@ -327,6 +355,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         // если получили разрешение, то
                         _map.setMyLocationEnabled(true); // включаем у карты местоположение
                         _map.getUiSettings().setMyLocationButtonEnabled(true); // добавляем кнопочку
+
+                        GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
+                            @Override
+                            public void onMyLocationChange(Location location) {
+                                if (locationIsChanged == false) {
+                                    LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+                                    if (_map != null) {
+                                        _map.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
+                                    }
+                                    locationIsChanged = true;
+                                }
+                            }
+                        };
+                        _map.setOnMyLocationChangeListener(myLocationChangeListener);
                     }
 
                     @Override public void onPermissionDenied(PermissionDeniedResponse response) {
