@@ -21,7 +21,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".HugePanoramaActivity"
+            android:theme="@style/AppTheme.TransparentBars"
+            >
+        </activity>
         <activity
             android:name=".SettingsActivity"
             android:theme="@style/AppTheme"

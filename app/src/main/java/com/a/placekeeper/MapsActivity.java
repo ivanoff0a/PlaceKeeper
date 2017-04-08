@@ -46,6 +46,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
 import com.google.android.gms.maps.model.StreetViewPanoramaLocation;
+import com.google.android.gms.maps.model.StreetViewPanoramaOrientation;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -55,6 +56,7 @@ import com.karumi.dexter.listener.single.PermissionListener;
 
 import static android.R.attr.permission;
 import static com.a.placekeeper.R.id.map;
+import static com.a.placekeeper.R.id.street_view_panorama_view;
 import static com.a.placekeeper.R.id.text;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnStreetViewPanoramaReadyCallback {
@@ -166,6 +168,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onStreetViewPanoramaReady(final StreetViewPanorama panorama) {
         mPanorama = panorama; // сохраняем панорамку в глобальную переменную
         //setPanoramaTo(mLatLng); // устанавливаем её в текущую позицию
+        mPanoramaView.setOnClickListener(new StreetViewPanorama.OnStreetViewPanoramaClickListener()) {
+            @Override
+            public void onStreetViewPanoramaClick(StreetViewPanoramaOrientation streetViewPanoramaOrientation) {
+
+            }
+        });
 
         // подписываемся на событие изменения координат в панораме
         mPanorama.setOnStreetViewPanoramaChangeListener(new StreetViewPanorama.OnStreetViewPanoramaChangeListener() {
