@@ -48,6 +48,7 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import static com.a.placekeeper.R.id.map;
+import static com.a.placekeeper.R.id.pinnedplacebutton;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnStreetViewPanoramaReadyCallback {
 
@@ -155,6 +156,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+        FloatingActionButton pinnedplacesbutton = (FloatingActionButton) findViewById(R.id.pinnedplacebutton);
+        searchbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+            }
+        });
     }
 
     public void onStreetViewPanoramaReady(final StreetViewPanorama panorama) {
@@ -259,6 +268,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mPanoramaView.animate().translationY(0);
                 mPanorama.setPosition(poi.latLng);
                 mLatLng = poi.latLng;
+                pinnedplacebutton.animate()
             }
         });
         _map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
