@@ -9,6 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -65,6 +68,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng mLatLng;
     Boolean bigPanoramaIsOpened = false;
     boolean locationIsChanged;
+    FloatingActionButton pinnedplacebutton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +88,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mPanoramaView.getStreetViewPanoramaAsync(this);// запускаем инициализацию панорамы
         mPanoramaView.setTranslationY(600);
+
+        MobileAds.initialize(getApplicationContext(), "ca-app-pub-9229888776029148~6309098316");//добавляем идентификатор ПРИЛОЖЕНИЯЕЙ
+        AdView mAdView = (AdView) findViewById(R.id.adView);//создаем вьюшку
+//        AdRequest adRequest = new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("EA41746F2D8B08BA5A5AB943BC932E74")  // An example device ID
+                .build();
+        mAdView.loadAd(adRequest);
 
         // настраиваем тулбар
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -156,7 +168,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-        FloatingActionButton pinnedplacesbutton = (FloatingActionButton) findViewById(R.id.pinnedplacebutton);
+        pinnedplacebutton = (FloatingActionButton) findViewById(R.id.pinnedplacebutton);
         searchbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -268,7 +280,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mPanoramaView.animate().translationY(0);
                 mPanorama.setPosition(poi.latLng);
                 mLatLng = poi.latLng;
-                pinnedplacebutton.animate()
+                //pinnedplacebutton.animate().tra
             }
         });
         _map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
