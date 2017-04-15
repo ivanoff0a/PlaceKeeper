@@ -95,7 +95,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mPanoramaView.setTranslationY(600);
 
         mTinyFavourites = TinyFavourites.getInstance(); // получаем TinyFavourites
-        mTinyFavourites.initialize(getContext()); // инициализируем TinyFavourites
+        mTinyFavourites.initialize(MapsActivity.this); // инициализируем TinyFavourites
 
 
         MobileAds.initialize(getApplicationContext(), "ca-app-pub-9229888776029148~6309098316");//добавляем идентификатор ПРИЛОЖЕНИЯЕЙ
@@ -123,7 +123,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.favourites_item:
-                        Intent intent = new Intent(MapsActivity.this, FavouriteActivity.class);
+                        Intent intent = new Intent(MapsActivity.this, PinnedPlacesActivity.class);
                         startActivity(intent);
                         mDrawerLayout.closeDrawer(Gravity.LEFT);
                         break;
@@ -177,13 +177,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+
         pinnedplacebutton = (FloatingActionButton) findViewById(R.id.pinnedplacebutton);
         pinnedplacebutton.setTranslationY(600);
-        searchbutton.setOnClickListener(new View.OnClickListener() {
+        pinnedplacebutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mTinyFavourites.addFavouritePlace(placeId);
-
+                if (mTinyFavourites.containFavouritePlace(placeId)) { // если место уже в любимых
+                    mTinyFavourites.removeFavouritePlace(placeId); // удаляем его из любимых
+                    Toast.makeText(MapsActivity.this, "Ваше место удалено из Избранного", Toast.LENGTH_SHORT).show();
+                    checkPinnedPlaceButton();
+                } else { // иначе
+                    mTinyFavourites.addFavouritePlace(placeId); // наоборот, добавляем его
+                    Toast.makeText(MapsActivity.this, "Ваше место добавленно в Избранное", Toast.LENGTH_SHORT).show();
+                    checkPinnedPlaceButton();
+                }
             }
         });
     }
@@ -290,7 +298,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mPanoramaView.animate().translationY(0);
                 mPanorama.setPosition(poi.latLng);
                 mLatLng = poi.latLng;
+                placeId = poi.placeId;
                 pinnedplacebutton.animate().translationY(0);
+                checkPinnedPlaceButton();
             }
         });
         _map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -414,4 +424,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 }).check(); // запускаем Dexter
     }
+
+    private void checkPinnedPlaceButton() {
+        if (mTinyFavourites.containFavouritePlace(placeId)) { // если место уже в любимых
+            pinnedplacebutton.setImageResource(R.drawable.ic_star_black_36dp);//заштрихованная
+        } else { // иначе
+            pinnedplacebutton.setImageResource(R.drawable.ic_star_outline_black_36dp);
+        }
+    }
+
 }

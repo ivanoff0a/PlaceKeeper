@@ -32,11 +32,6 @@
             >
         </activity>
         <activity
-            android:name=".FavouriteActivity"
-            android:theme="@style/AppTheme"
-            >
-        </activity>
-        <activity
             android:name=".PinnedPlacesActivity"
             android:theme="@style/AppTheme"
             >

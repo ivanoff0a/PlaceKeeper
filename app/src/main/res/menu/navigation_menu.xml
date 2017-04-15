@@ -9,7 +9,7 @@
         <item
             android:id="@+id/favourites_item"
             android:checkable="true"
-            android:title="Ваши Места"
+            android:title="Избранные места"
             android:icon="@drawable/ic_place_white_36dp"
             />
         <item
