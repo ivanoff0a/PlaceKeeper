@@ -49,6 +49,9 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.kuelye.banana.examples.tinyfavourites.TinyFavourites;
+
+import java.util.List;
 
 import static com.a.placekeeper.R.id.map;
 import static com.a.placekeeper.R.id.pinnedplacebutton;
@@ -69,6 +72,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     Boolean bigPanoramaIsOpened = false;
     boolean locationIsChanged;
     FloatingActionButton pinnedplacebutton;
+    TinyFavourites mTinyFavourites;
+    String placeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,12 +94,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mPanoramaView.getStreetViewPanoramaAsync(this);// запускаем инициализацию панорамы
         mPanoramaView.setTranslationY(600);
 
+        mTinyFavourites = TinyFavourites.getInstance(); // получаем TinyFavourites
+        mTinyFavourites.initialize(getContext()); // инициализируем TinyFavourites
+
+
         MobileAds.initialize(getApplicationContext(), "ca-app-pub-9229888776029148~6309098316");//добавляем идентификатор ПРИЛОЖЕНИЯЕЙ
         AdView mAdView = (AdView) findViewById(R.id.adView);//создаем вьюшку
-//        AdRequest adRequest = new AdRequest.Builder().build();
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("EA41746F2D8B08BA5A5AB943BC932E74")  // An example device ID
-                .build();
+        AdRequest adRequest = new AdRequest.Builder().build();
+//        AdRequest adRequest = new AdRequest.Builder()
+//                .addTestDevice("EA41746F2D8B08BA5A5AB943BC932E74")  // An example device ID
+//                .build();
         mAdView.loadAd(adRequest);
 
         // настраиваем тулбар
@@ -169,10 +178,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
         pinnedplacebutton = (FloatingActionButton) findViewById(R.id.pinnedplacebutton);
+        pinnedplacebutton.setTranslationY(600);
         searchbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                mTinyFavourites.addFavouritePlace(placeId);
 
             }
         });
@@ -280,13 +290,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mPanoramaView.animate().translationY(0);
                 mPanorama.setPosition(poi.latLng);
                 mLatLng = poi.latLng;
-                //pinnedplacebutton.animate().tra
+                pinnedplacebutton.animate().translationY(0);
             }
         });
         _map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
                 mPanoramaView.animate().translationY(600);
+                pinnedplacebutton.animate().translationY(600);
 
 
             }
