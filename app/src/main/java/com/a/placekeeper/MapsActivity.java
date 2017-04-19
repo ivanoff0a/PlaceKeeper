@@ -323,7 +323,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.google_map_style_standard));
-        _map.setPadding(0, 200, 0, 0);
+        _map.setPadding(5,250,300, 30);
 
 
         _map.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
