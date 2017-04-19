@@ -14,6 +14,10 @@
         <activity
             android:name=".MapsActivity"
             android:theme="@style/AppTheme.NoActionBar"
+            />
+        <activity
+            android:name=".LaunchActivity"
+            android:theme="@style/AppTheme.TransparentBars"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

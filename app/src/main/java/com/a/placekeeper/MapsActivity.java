@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 
@@ -82,12 +83,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_map);
-
+        mTinyFavourites = TinyFavourites.getInstance(); // получаем TinyFavourites
+        mTinyFavourites.initialize(MapsActivity.this); // инициализируем TinyFavourites
         // лучше читать письмо (интент) сразу, в начале метода onCreate(...)
         // но иногда бываем необходимым ещё чего-нибудь тут сделать до чтения
 
         if (getIntent().hasExtra("МЕСТО")) { // если письмо (интент) содержит
             final String placeId = getIntent().getExtras().getString("МЕСТО"); // читаем
+            mTinyFavourites.getFavouritePlace(placeId, new TinyFavourites.GetPlaceCallback() {
+                @Override
+                public void onResult(@Nullable Place place) {
+                    _map.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 16.0f));
+                }
+            });
         }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -104,8 +112,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mPanoramaView.getStreetViewPanoramaAsync(this);// запускаем инициализацию панорамы
         mPanoramaView.setTranslationY(600);
 
-        mTinyFavourites = TinyFavourites.getInstance(); // получаем TinyFavourites
-        mTinyFavourites.initialize(MapsActivity.this); // инициализируем TinyFavourites
+
 
 
         MobileAds.initialize(getApplicationContext(), "ca-app-pub-9229888776029148~6309098316");//добавляем идентификатор ПРИЛОЖЕНИЯЕЙ

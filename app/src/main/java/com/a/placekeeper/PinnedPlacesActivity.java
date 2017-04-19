@@ -92,32 +92,26 @@ String placeId;
 
         listView = (ListView) findViewById(R.id.listView); // находим список
 
-        mTinyFavourites.getPlaces(new TinyFavourites.GetPlacesCallback() {
+        final TinyFavourites.GetPlacesCallback callback = new TinyFavourites.GetPlacesCallback() {
 
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(PinnedPlacesActivity.this, MapsActivity.class);
-                startActivity(intent);
-                intent.putExtra("МЕСТО", placeId);
-
+            @Override
+            public void onResult(@NonNull final List<Place> places) {
+                PlacesAdapter adapter = new PlacesAdapter(PinnedPlacesActivity.this, android.R.layout.simple_list_item_1, places);
+                listView.setAdapter(adapter); // присоединяем адаптер к списку
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent intent = new Intent(PinnedPlacesActivity.this, MapsActivity.class);
                         startActivity(intent);
+                        placeId = places.get(position).getId();
                         intent.putExtra("МЕСТО", placeId);
 
 
 
                     }
                 });
-
             }
-            @Override
-            public void onResult(@NonNull List<Place> places) {
-                PlacesAdapter adapter = new PlacesAdapter(PinnedPlacesActivity.this, android.R.layout.simple_list_item_1, places);
-                listView.setAdapter(adapter); // присоединяем адаптер к списку
-
-            }
-        });
+        };
+        mTinyFavourites.getPlaces(callback);
     }
 }
