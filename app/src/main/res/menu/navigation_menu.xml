@@ -7,6 +7,12 @@
         android:checkableBehavior="single"
         >
         <item
+            android:id="@+id/map_item"
+            android:checkable="true"
+            android:title="Карта"
+            android:icon="@drawable/ic_google_maps_black_36dp"
+            />
+        <item
             android:id="@+id/favourites_item"
             android:checkable="true"
             android:title="Избранные места"

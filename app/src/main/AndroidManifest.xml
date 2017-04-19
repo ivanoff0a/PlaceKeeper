@@ -3,6 +3,7 @@
     package="com.a.placekeeper">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher2"
@@ -10,7 +11,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         >
-
         <activity
             android:name=".MapsActivity"
             android:theme="@style/AppTheme.NoActionBar"

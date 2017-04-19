@@ -17,11 +17,13 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.kuelye.banana.examples.tinyfavourites.TinyFavourites;
 
 import java.util.HashSet;
@@ -39,6 +41,8 @@ TinyFavourites mTinyFavourites;
 ListView listView;
 GoogleMap _map;
 DrawerLayout mDrawerLayout;
+LatLng mLatLng;
+String placeId;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,18 +51,24 @@ DrawerLayout mDrawerLayout;
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setTitle("Избранное");
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout); // находим меню888
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.getMenu().findItem(R.id.favourites_item).setChecked(true);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.settings_item:
-                        Intent intent2 = new Intent(PinnedPlacesActivity.this, SettingsActivity.class);
-                        startActivity(intent2);
+                    case R.id.map_item:
+                        Intent intent = new Intent(PinnedPlacesActivity.this, MapsActivity.class);
+                        startActivity(intent);
                         mDrawerLayout.closeDrawer(Gravity.LEFT);
                         break;
-
+                    case R.id.settings_item:
+                        Intent intent1 = new Intent(PinnedPlacesActivity.this, SettingsActivity.class);
+                        startActivity(intent1);
+                        mDrawerLayout.closeDrawer(Gravity.LEFT);
+                        break;
                     case R.id.mapschooser1_item:
                         _map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                         mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -81,7 +91,27 @@ DrawerLayout mDrawerLayout;
         mTinyFavourites = TinyFavourites.getInstance();
 
         listView = (ListView) findViewById(R.id.listView); // находим список
+
         mTinyFavourites.getPlaces(new TinyFavourites.GetPlacesCallback() {
+
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(PinnedPlacesActivity.this, MapsActivity.class);
+                startActivity(intent);
+                intent.putExtra("МЕСТО", placeId);
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Intent intent = new Intent(PinnedPlacesActivity.this, MapsActivity.class);
+                        startActivity(intent);
+                        intent.putExtra("МЕСТО", placeId);
+
+
+
+                    }
+                });
+
+            }
             @Override
             public void onResult(@NonNull List<Place> places) {
                 PlacesAdapter adapter = new PlacesAdapter(PinnedPlacesActivity.this, android.R.layout.simple_list_item_1, places);

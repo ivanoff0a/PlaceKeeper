@@ -28,6 +28,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -55,6 +56,8 @@ import java.util.List;
 
 import static com.a.placekeeper.R.id.map;
 import static com.a.placekeeper.R.id.pinnedplacebutton;
+import static com.a.placekeeper.R.styleable.FloatingActionButton;
+import static com.a.placekeeper.R.styleable.Toolbar;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnStreetViewPanoramaReadyCallback {
 
@@ -79,6 +82,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_map);
+
+        // лучше читать письмо (интент) сразу, в начале метода onCreate(...)
+        // но иногда бываем необходимым ещё чего-нибудь тут сделать до чтения
+
+        if (getIntent().hasExtra("МЕСТО")) { // если письмо (интент) содержит
+            final String placeId = getIntent().getExtras().getString("МЕСТО"); // читаем
+        }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
@@ -117,14 +127,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0); // создаём штуку, которая будет анимировать иконку (и не только)
         mDrawerLayout.addDrawerListener(mDrawerToggle); // подписываем её на события открытия и закрытия меню (чтобы она знала, когда нужно анимировать кнопку)
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.getMenu().findItem(R.id.map_item).setChecked(true);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.favourites_item:
-                        Intent intent = new Intent(MapsActivity.this, PinnedPlacesActivity.class);
-                        startActivity(intent);
+                        Intent intent1 = new Intent(MapsActivity.this, PinnedPlacesActivity.class);
+                        startActivity(intent1);
                         mDrawerLayout.closeDrawer(Gravity.LEFT);
                         break;
                     case R.id.settings_item:
@@ -194,7 +206,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
+
     }
+    public void setPadding(){
+        _map.setPadding(5,250,300, 30);
+    }
+
 
     public void onStreetViewPanoramaReady(final StreetViewPanorama panorama) {
         mPanorama = panorama; // сохраняем панорамку в глобальную переменную
@@ -227,6 +244,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
     }
+    // Get the button view
+//    View locationButton = ((View) MapView.findViewById(1).getParent()).findViewById(2);
+//
+//    // and next place it, for exemple, on bottom right (as Google Maps app)
+//    RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+//    // position on right bottom
+//    rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+//    rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+//    rlp.setMargins(0, 0, 30, 30);
+
 
     public void onResume(){
         super.onResume();
