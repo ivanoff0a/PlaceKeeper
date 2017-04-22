@@ -196,6 +196,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+        FloatingActionButton startmovingb = (FloatingActionButton) findViewById(R.id.recordroutebutton);
+        startmovingb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+
 
         pinnedplacebutton = (FloatingActionButton) findViewById(R.id.pinnedplacebutton);
         pinnedplacebutton.setTranslationY(600);
@@ -218,6 +225,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void setPadding(){
         _map.setPadding(5,250,300, 30);
     }
+}
 
 
     public void onStreetViewPanoramaReady(final StreetViewPanorama panorama) {

@@ -13,19 +13,12 @@
         android:layout_height="match_parent"
         >
 
-        <android.support.design.widget.FloatingActionButton
-            android:src="@drawable/ic_search_black_36dp"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/button2"
-            app:backgroundTint="#ffff"
-            app:elevation="10dp"
-            android:layout_marginRight="14dp"
-            android:layout_marginEnd="14dp"
-            android:layout_marginTop="136dp"
-            android:layout_below="@+id/toolbar"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginTop="25dp"
+            android:background="@null" />
 
         <fragment
             android:id="@+id/map"
@@ -38,28 +31,17 @@
             android:layout_alignParentStart="true" />
 
         <android.support.design.widget.FloatingActionButton
-            android:src="@drawable/ic_transfer_within_a_station_black_36dp"
+            android:src="@drawable/ic_search_black_36dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/button2"
+            android:layout_marginRight="5dp"
             app:backgroundTint="#ffff"
             app:elevation="10dp"
-            android:id="@+id/recordroutebutton"
-            android:layout_centerVertical="true"
-            android:layout_alignLeft="@+id/button2"
-            android:layout_alignStart="@+id/button2" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:src="@drawable/ic_star_outline_black_36dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:backgroundTint="#ffff"
-            app:elevation="10dp"
-            android:id="@+id/pinnedplacebutton"
-            android:layout_alignBottom="@+id/street_view_panorama_view"
-            android:layout_alignLeft="@+id/button2"
-            android:layout_alignStart="@+id/button2"
-            android:layout_alignRight="@+id/recordroutebutton"
-            android:layout_alignEnd="@+id/recordroutebutton" />
+            android:layout_marginTop="136dp"
+            android:layout_below="@+id/toolbar"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView"
@@ -71,24 +53,40 @@
             ads:adUnitId="ca-app-pub-9229888776029148/9122963912">
         </com.google.android.gms.ads.AdView>
 
+        <android.support.design.widget.FloatingActionButton
+            android:src="@drawable/ic_transfer_within_a_station_black_36dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:backgroundTint="#ffff"
+            app:elevation="10dp"
+            android:id="@+id/recordroutebutton"
+            android:layout_marginTop="11dp"
+            android:layout_below="@+id/button2"
+            android:layout_alignLeft="@+id/button2"
+            android:layout_alignStart="@+id/button2" />
+
         <com.google.android.gms.maps.StreetViewPanoramaView
             android:id="@+id/street_view_panorama_view"
             android:layout_width="220dp"
             android:layout_height="120dp"
             android:layout_weight="0.5"
-            android:layout_marginBottom="14dp"
-            android:layout_marginLeft="11dp"
-            android:layout_marginStart="11dp"
+            android:layout_marginLeft="13dp"
+            android:layout_marginStart="13dp"
             android:layout_above="@+id/adView"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="10dp" />
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <android.support.design.widget.FloatingActionButton
+            android:src="@drawable/ic_star_outline_black_36dp"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_marginTop="25dp"
-            android:background="@null" />
+            android:layout_height="wrap_content"
+            app:backgroundTint="#ffff"
+            app:elevation="10dp"
+            android:id="@+id/pinnedplacebutton"
+            android:layout_alignBottom="@+id/street_view_panorama_view"
+            android:layout_alignLeft="@+id/recordroutebutton"
+            android:layout_alignStart="@+id/recordroutebutton" />
     </RelativeLayout>
 
     <LinearLayout
