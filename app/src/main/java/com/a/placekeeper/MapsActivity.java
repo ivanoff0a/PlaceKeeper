@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,11 +39,14 @@ import com.google.android.gms.maps.OnStreetViewPanoramaReadyCallback;
 import com.google.android.gms.maps.StreetViewPanorama;
 import com.google.android.gms.maps.StreetViewPanoramaView;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PointOfInterest;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
 import com.google.android.gms.maps.model.StreetViewPanoramaLocation;
 import com.karumi.dexter.Dexter;
@@ -74,10 +78,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private StreetViewPanorama mPanorama; // cама панорама
     private LatLng mLatLng;
     Boolean bigPanoramaIsOpened = false;
-    boolean locationIsChanged;
+    boolean locationIsChanged = false;
+    boolean recordingroute = false;
     FloatingActionButton pinnedplacebutton;
     TinyFavourites mTinyFavourites;
     String placeId;
+    Marker currentMarker;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,12 +203,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-        FloatingActionButton startmovingb = (FloatingActionButton) findViewById(R.id.recordroutebutton);
-        startmovingb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-            }
+        final FloatingActionButton startmovingb = (FloatingActionButton) findViewById(R.id.recordroutebutton);
+        startmovingb.setOnClickListener
+                (new View.OnClickListener() {
+                     @Override
+                     public void onClick(View v) {
+                     if (recordingroute == true){
+                     startmovingb.setImageResource(R.drawable.recordingimage);
+                     recordingroute = false;
+                     }else{
+                     startmovingb.setImageResource(R.drawable.ic_transfer_within_a_station_black_36dp);
+                     recordingroute = true;
+                     }
+                     }
+                 });
+
+
 
 
         pinnedplacebutton = (FloatingActionButton) findViewById(R.id.pinnedplacebutton);
@@ -223,11 +241,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
     public void setPadding(){
-        _map.setPadding(5,250,300, 30);
+        _map.setPadding(500,1000,5, 30);
     }
-}
 
-
+    public void drawRoute(LatLng currentL) {
+        PolylineOptions polylineOptions = new PolylineOptions()
+                .add(currentL)
+                //.add(previousL)
+                .color(Color.BLUE);
+        _map.addPolyline(polylineOptions);
+    }
     public void onStreetViewPanoramaReady(final StreetViewPanorama panorama) {
         mPanorama = panorama; // сохраняем панорамку в глобальную переменную
         //setPanoramaTo(mLatLng); // устанавливаем её в текущую позицию
@@ -259,17 +282,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
     }
-    // Get the button view
-//    View locationButton = ((View) MapView.findViewById(1).getParent()).findViewById(2);
-//
-//    // and next place it, for exemple, on bottom right (as Google Maps app)
-//    RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-//    // position on right bottom
-//    rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-//    rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-//    rlp.setMargins(0, 0, 30, 30);
-
-
     public void onResume(){
         super.onResume();
         bigPanoramaIsOpened = false;
@@ -331,7 +343,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.google_map_style_standard));
-        _map.setPadding(5,250,300, 30);
+        _map.setPadding(770,1030, 5, 30);
 
 
         _map.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
@@ -343,6 +355,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 placeId = poi.placeId;
                 pinnedplacebutton.animate().translationY(0);
                 checkPinnedPlaceButton();
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(poi.latLng) // координаты
+                        //.snippet() // описание
+                        .alpha(0.9f) // прозрачность
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.mapmarker)) // иконка
+                        .flat(true); // делаем плоской иконку
+                _map.addMarker(markerOptions);
             }
         });
         _map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -350,6 +369,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onMapClick(LatLng latLng) {
                 mPanoramaView.animate().translationY(600);
                 pinnedplacebutton.animate().translationY(600);
+
 
 
             }
@@ -444,6 +464,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
                             @Override
                             public void onMyLocationChange(Location location) {
+                                double latitude = location.getLatitude();
+                                double longtitude = location.getAltitude();
+                                LatLng currentL = new LatLng(latitude, longtitude);
+                                drawRoute(currentL);
                                 if (locationIsChanged == false) {
                                     LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
                                     if (_map != null) {
@@ -474,5 +498,4 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             pinnedplacebutton.setImageResource(R.drawable.ic_star_outline_black_36dp);
         }
     }
-
 }
