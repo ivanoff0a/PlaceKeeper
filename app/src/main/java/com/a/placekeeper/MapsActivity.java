@@ -26,11 +26,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,7 +40,6 @@ import com.google.android.gms.maps.StreetViewPanorama;
 import com.google.android.gms.maps.StreetViewPanoramaView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
@@ -57,34 +56,34 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 import com.kuelye.banana.examples.tinyfavourites.TinyFavourites;
 
-import java.util.List;
-
 import static com.a.placekeeper.R.id.map;
-import static com.a.placekeeper.R.id.pinnedplacebutton;
-import static com.a.placekeeper.R.styleable.FloatingActionButton;
-import static com.a.placekeeper.R.styleable.Toolbar;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnStreetViewPanoramaReadyCallback {
 
     private static final int REQUEST_CODE_PLACE_PICKER = 1;
 
-    DrawerLayout mDrawerLayout;
-    ActionBarDrawerToggle mDrawerToggle;
-    GoogleMap _map;
-    EditText editText;
-    Boolean mPickerStarted = false;
-    MapView mMapView;
+    // === ПЕРЕМЕННЫЕ
+
+    DrawerLayout mDrawerLayout; // менюшка
+    ActionBarDrawerToggle mDrawerToggle; // штука, которая управляет анимация кнопки ДОМОЙ
+    GoogleMap _map; // карта
+    EditText editText; // ???
+    Boolean mPickerStarted = false; // флаг, = true, если уже запущена выбиралка мест, и = false - в противном случае
+    MapView mMapView; // вьюшка, отрисовывающая карту
     private StreetViewPanoramaView mPanoramaView; // вьюшка с панорамой
     private StreetViewPanorama mPanorama; // cама панорама
-    private LatLng mLatLng;
-    Boolean bigPanoramaIsOpened = false;
-    boolean locationIsChanged = false;
-    boolean recordingroute = false;
-    FloatingActionButton pinnedplacebutton;
-    TinyFavourites mTinyFavourites;
-    String placeId;
-    Marker currentMarker;
+    private LatLng mLastPoiLatLng; // координаты последнего POI, на который кликнули
+    Boolean bigPanoramaIsOpened = false; // открыта ли большая панорама
+    boolean locationIsChanged = false; // false - вначале, когда приходят координаты мп меняется на true
+    boolean recordingroute = false; // = true, когда включена запись маршрута
+    FloatingActionButton pinnedplacebutton; // фаб
+    TinyFavourites mTinyFavourites; // штука с избранным
+    String placeId; // идентификатор последнего POI, на который кликнул
+    LatLng mPreviousLatLng; // ???
 
+    // === МЕТОДЫ
+
+    // === Жизненный цикл активности ===
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -240,85 +239,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
     }
-    public void setPadding(){
-        _map.setPadding(500,1000,5, 30);
-    }
-
-    public void drawRoute(LatLng currentL) {
-        PolylineOptions polylineOptions = new PolylineOptions()
-                .add(currentL)
-                //.add(previousL)
-                .color(Color.BLUE);
-        _map.addPolyline(polylineOptions);
-    }
-    public void onStreetViewPanoramaReady(final StreetViewPanorama panorama) {
-        mPanorama = panorama; // сохраняем панорамку в глобальную переменную
-        //setPanoramaTo(mLatLng); // устанавливаем её в текущую позицию
-
-        mPanorama.setOnStreetViewPanoramaCameraChangeListener(new StreetViewPanorama.OnStreetViewPanoramaCameraChangeListener() {
-            @Override
-            public void onStreetViewPanoramaCameraChange(StreetViewPanoramaCamera streetViewPanoramaCamera) {
-                if (bigPanoramaIsOpened == false) {
-                    Intent intent = new Intent(MapsActivity.this, HugePanoramaActivity.class);
-                    intent.putExtra("LATLNG", mLatLng);
-                    startActivity(intent);
-                    bigPanoramaIsOpened = true;
-                }
-
-            }
-        });
-
-        // подписываемся на событие изменения координат в панораме
-        mPanorama.setOnStreetViewPanoramaChangeListener(new StreetViewPanorama.OnStreetViewPanoramaChangeListener() {
-            @Override
-            public void onStreetViewPanoramaChange(StreetViewPanoramaLocation streetViewPanoramaLocation) {
-                if (streetViewPanoramaLocation != null && streetViewPanoramaLocation.links != null) {
-                    // панорама есть
-                } else {
-                    // панорамы нет
-                    mPanoramaView.setTranslationY(400);
-
-                }
-            }
-        });
-    }
-    public void onResume(){
-        super.onResume();
-        bigPanoramaIsOpened = false;
-    }
-
-
-//        super.onResume();
-//
-//        String text = load();
-//        editText.setText(text);
-//    }
-//    public void onResume(){
-//        super.onResume();
-//
-//        String text = load();
-//        editText.setText(text);
-//    }
-//
-//    public void onPause(){
-//        super.onPause();
-//
-//        save(editText.getText().toString());
-//    }
-//
-//    private void save(String text){
-//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-//        SharedPreferences.Editor editor = preferences.edit();
-//        editor.putString("СТРОЧКА", text);
-//        editor.commit();
-//    }
-//
-//    private String load(){
-//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-//        String text = preferences.getString("СТРОЧКА", "");
-//
-//        return text;
-//    }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -327,53 +247,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mDrawerToggle.syncState();
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public void onMapReady(GoogleMap map) {
-        // Add a marker in Sydney, Australia, and move the camera.
-        _map = map;
-        LatLng sydney = new LatLng(60.017584, 30.366934);
-        setMyLocationEnabled();
-        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.google_map_style_standard));
-        _map.setPadding(770,1030, 5, 30);
-
-
-        _map.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
-            @Override
-            public void onPoiClick(PointOfInterest poi) {
-                mPanoramaView.animate().translationY(0);
-                mPanorama.setPosition(poi.latLng);
-                mLatLng = poi.latLng;
-                placeId = poi.placeId;
-                pinnedplacebutton.animate().translationY(0);
-                checkPinnedPlaceButton();
-                MarkerOptions markerOptions = new MarkerOptions()
-                        .position(poi.latLng) // координаты
-                        //.snippet() // описание
-                        .alpha(0.9f) // прозрачность
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.mapmarker)) // иконка
-                        .flat(true); // делаем плоской иконку
-                _map.addMarker(markerOptions);
-            }
-        });
-        _map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                mPanoramaView.animate().translationY(600);
-                pinnedplacebutton.animate().translationY(600);
-
-
-
-            }
-        });
+    public void onResume(){
+        super.onResume();
+        bigPanoramaIsOpened = false;
     }
 
     @Override
@@ -394,23 +270,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    /**
-     * Метод открывает выбиралку мест.
-     */
-    private void pickPlace() {
-        if (mPickerStarted) { // если выбиралка запущена
-            Toast.makeText(MapsActivity.this, "Подождите, сейчас всё будет.", Toast.LENGTH_LONG).show();
-        } else {
-            try {
-                PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder(); // создаём строителя конверта для запуска активности с выбиралкой мест
-                intentBuilder.setLatLngBounds(_map.getProjection().getVisibleRegion().latLngBounds); // в него кладём также выбранный на карте регион
-                Intent intent = intentBuilder.build(MapsActivity.this); // создаём конверт
-                startActivityForResult(intent, REQUEST_CODE_PLACE_PICKER); // стартуем активность
-                mPickerStarted = true; // ставим флаг, что запустили выбиралку
-            } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-                // ошибки игнорируем
-            }
-        }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -435,21 +299,135 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    // === Карта и панорама ===
+
+    @Override
+    public void onStreetViewPanoramaReady(final StreetViewPanorama panorama) {
+        mPanorama = panorama; // сохраняем панорамку в глобальную переменную
+        //setPanoramaTo(mLastPoiLatLng); // устанавливаем её в текущую позицию
+
+        mPanorama.setOnStreetViewPanoramaCameraChangeListener(new StreetViewPanorama.OnStreetViewPanoramaCameraChangeListener() {
+            @Override
+            public void onStreetViewPanoramaCameraChange(StreetViewPanoramaCamera streetViewPanoramaCamera) {
+                if (bigPanoramaIsOpened == false) {
+                    Intent intent = new Intent(MapsActivity.this, HugePanoramaActivity.class);
+                    intent.putExtra("LATLNG", mLastPoiLatLng);
+                    startActivity(intent);
+                    bigPanoramaIsOpened = true;
+                }
+
+            }
+        });
+
+        // подписываемся на событие изменения координат в панораме
+        mPanorama.setOnStreetViewPanoramaChangeListener(new StreetViewPanorama.OnStreetViewPanoramaChangeListener() {
+            @Override
+            public void onStreetViewPanoramaChange(StreetViewPanoramaLocation streetViewPanoramaLocation) {
+                if (streetViewPanoramaLocation != null && streetViewPanoramaLocation.links != null) {
+                    // панорама есть
+                } else {
+                    // панорамы нет
+                    mPanoramaView.setTranslationY(400);
+
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        // Add a marker in Sydney, Australia, and move the camera.
+        _map = map;
+        LatLng sydney = new LatLng(60.017584, 30.366934);
+        setMyLocationEnabled();
+        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        _map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.google_map_style_standard));
+        _map.setPadding(770,1030, 5, 30);
+
+
+        _map.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
+            @Override
+            public void onPoiClick(PointOfInterest poi) {
+                mPanoramaView.animate().translationY(0);
+                mPanorama.setPosition(poi.latLng);
+                mLastPoiLatLng = poi.latLng;
+                placeId = poi.placeId;
+                pinnedplacebutton.animate().translationY(0);
+                checkPinnedPlaceButton();
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(poi.latLng) // координаты
+                        //.snippet() // описание
+                        .alpha(0.9f) // прозрачность
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.mapmarker)) // иконка
+                        .flat(true); // делаем плоской иконку
+                _map.addMarker(markerOptions);
+            }
+        });
+        _map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                mPanoramaView.animate().translationY(600);
+                pinnedplacebutton.animate().translationY(600);
 
 
 
-    private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
-        @Override
-        public void onMyLocationChange(Location location) {
-            Marker marker;
-            LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-            marker = _map.addMarker(new MarkerOptions().position(loc));
-            if(_map != null){
-                _map.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
+            }
+        });
+    }
+
+    // === Разное
+
+    /**
+     * Двигает компас и другие иконки.
+     */
+    public void setPadding(){
+        _map.setPadding(500,1000,5, 30);
+    }
+
+    /**
+     * Рисует маршрут от предыдущей точки к текущей.
+     * @param currentL Координаты текущего местоположения.
+     */
+    public void drawRoute(LatLng currentL) {
+        Log.v("ASADSAD", "ASDASDSA");
+        boolean previousLatLngNotNull = mPreviousLatLng != null;
+        boolean distanceChanged = true; // TODO
+        if (previousLatLngNotNull && distanceChanged) {
+            // создаём полилинию
+            PolylineOptions polylineOptions = new PolylineOptions()
+                    .add(mPreviousLatLng)
+                    .add(currentL)
+                    .color(Color.BLUE);
+            // добавляем полилинию на карту
+            _map.addPolyline(polylineOptions);
+        }
+
+        mPreviousLatLng = currentL;
+    }
+
+    /**
+     * Метод открывает выбиралку мест.
+     */
+    private void pickPlace() {
+        if (mPickerStarted) { // если выбиралка запущена
+            Toast.makeText(MapsActivity.this, "Подождите, сейчас всё будет.", Toast.LENGTH_LONG).show();
+        } else {
+            try {
+                PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder(); // создаём строителя конверта для запуска активности с выбиралкой мест
+                intentBuilder.setLatLngBounds(_map.getProjection().getVisibleRegion().latLngBounds); // в него кладём также выбранный на карте регион
+                Intent intent = intentBuilder.build(MapsActivity.this); // создаём конверт
+                startActivityForResult(intent, REQUEST_CODE_PLACE_PICKER); // стартуем активность
+                mPickerStarted = true; // ставим флаг, что запустили выбиралку
+            } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                // ошибки игнорируем
             }
         }
-    };
+    }
 
+    /**
+     * Включает возможность определения местоположения.
+     */
     public void setMyLocationEnabled(){
         Dexter.withActivity(MapsActivity.this) // создаём этот Dexter
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION) // просим попросить у пользователя разрешение на геолокационные данные
@@ -491,6 +469,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }).check(); // запускаем Dexter
     }
 
+    /**
+     * Меняет иконку звёздочки.
+     */
     private void checkPinnedPlaceButton() {
         if (mTinyFavourites.containFavouritePlace(placeId)) { // если место уже в любимых
             pinnedplacebutton.setImageResource(R.drawable.ic_star_black_36dp);//заштрихованная
@@ -498,4 +479,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             pinnedplacebutton.setImageResource(R.drawable.ic_star_outline_black_36dp);
         }
     }
+
+    // === Архив
+
+    //   private void save(String text){
+//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        SharedPreferences.Editor editor = preferences.edit();
+//        editor.putString("СТРОЧКА", text);
+//        editor.commit();
+//    }z
+//
+//    private String load(){
+//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        String text = preferences.getString("СТРОЧКА", "");
+//
+//        return text;
+//    }
+
+
 }
